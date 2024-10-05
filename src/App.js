@@ -5,6 +5,7 @@ import Home from "./components/routes/Home";
 import Header from "./components/custom/header";
 import { UserProvider } from "./context/UserContext";
 import DraughtDashboard from "./components/routes/DraughtDashboard";
+import PlantRecommendationSystem from "./components/routes/PlantRec";
 const App = () => {
   return (
     <UserProvider>
@@ -17,8 +18,8 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route
-            path="/plant-recommendation"
-            element={<div>Plant Recommendation</div>}
+            path="/plantrec"
+            element={<PlantRecommendationSystem />}
           />
           <Route path="/draughts" element={<DraughtDashboard />} />
         </Routes>
