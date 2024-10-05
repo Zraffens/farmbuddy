@@ -8,7 +8,17 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import L from "leaflet";
-import { Leaf, MapPin, Droplets, Sun, Wind } from "lucide-react";
+import {
+  Leaf,
+  MapPin,
+  Droplets,
+  Sun,
+  Wind,
+  Cloud,
+  CloudRain,
+  CloudSnow,
+  CloudLightning,
+} from "lucide-react";
 import "leaflet/dist/leaflet.css";
 
 // Fix for default marker icon
@@ -51,23 +61,82 @@ const LocationMarker = ({ position, setPosition, setLocationData }) => {
   return position === null ? null : <Marker position={position} />;
 };
 
+const WeatherIcon = ({ condition }) => {
+  const iconMap = {
+    Clear: Sun,
+    Clouds: Cloud,
+    Rain: CloudRain,
+    Snow: CloudSnow,
+    Thunderstorm: CloudLightning,
+    Drizzle: CloudRain,
+    Mist: Cloud,
+    Smoke: Cloud,
+    Haze: Cloud,
+    Dust: Wind,
+    Fog: Cloud,
+    Sand: Wind,
+    Ash: Cloud,
+    Squall: Wind,
+    Tornado: Wind,
+  };
+
+  const Icon = iconMap[condition] || Cloud;
+
+  return (
+    <motion.div
+      initial={{ scale: 0 }}
+      animate={{ scale: 1 }}
+      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+    >
+      <Icon className="w-16 h-16 text-blue-500" />
+    </motion.div>
+  );
+};
+
 const PlantRecommendationSystem = () => {
   const [npk, setNpk] = useState({ n: "", p: "", k: "" });
   const [position, setPosition] = useState(null);
   const [recommendation, setRecommendation] = useState(null);
   const [askingLocation, setAskingLocation] = useState(true);
   const [locationData, setLocationData] = useState(null);
-  const dummyWeatherData = {
-    temperature: 25,
-    humidity: 60,
-    rainfall: 1000,
-  };
+  const [weatherData, setWeatherData] = useState(null);
+  const [monthlyRainfall, setMonthlyRainfall] = useState(null);
 
   const dummyPlants = [
     { name: "Rice", image: "https://via.placeholder.com/150?text=Rice" },
     { name: "Wheat", image: "https://via.placeholder.com/150?text=Wheat" },
     { name: "Maize", image: "https://via.placeholder.com/150?text=Maize" },
   ];
+
+  const fetchWeatherData = async (lat, lon) => {
+    const API_KEY = process.env.REACT_APP_OPENWAPI; 
+    console.log(process.env);
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
+      );
+      const data = await response.json();
+      setWeatherData({
+        temperature: data.main.temp,
+        humidity: data.main.humidity,
+        condition: data.weather[0].main,
+        description: data.weather[0].description,
+        windSpeed: data.wind.speed,
+      });
+
+      // Fetch monthly rainfall data (this is a placeholder, as OpenWeatherAPI doesn't provide monthly data in the free tier)
+      // You might need to use a different API or calculate this based on historical data
+      setMonthlyRainfall(Math.random() * 100); // Placeholder: random value between 0-100 mm
+    } catch (error) {
+      console.error("Error fetching weather data:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (position) {
+      fetchWeatherData(position.lat, position.lng);
+    }
+  }, [position]);
 
   const handleNpkChange = (e) => {
     setNpk({ ...npk, [e.target.name]: e.target.value });
@@ -150,26 +219,42 @@ const PlantRecommendationSystem = () => {
                 </div>
 
                 {locationData && (
-                  <div className="mt-4 p-4 bg-green-50 rounded-md">
-                    <h3 className="text-lg font-semibold mb-2">
-                      Location Details:
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="mt-4 p-6 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg shadow-md text-white"
+                  >
+                    <h3 className="text-xl font-semibold mb-3">
+                      Location Details
                     </h3>
-                    <ul className="space-y-1">
-                      {locationData.city && <li>City: {locationData.city}</li>}
+                    <div className="grid grid-cols-2 gap-2">
+                      {locationData.city && (
+                        <div className="flex items-center">
+                          <MapPin className="w-5 h-5 mr-2" />
+                          <span>{locationData.city}</span>
+                        </div>
+                      )}
                       {locationData.state && (
-                        <li>State: {locationData.state}</li>
+                        <div className="flex items-center">
+                          <MapPin className="w-5 h-5 mr-2" />
+                          <span>{locationData.state}</span>
+                        </div>
                       )}
                       {locationData.country && (
-                        <li>Country: {locationData.country}</li>
-                      )}
-                      {locationData.county && (
-                        <li>County/District: {locationData.county}</li>
+                        <div className="flex items-center">
+                          <MapPin className="w-5 h-5 mr-2" />
+                          <span>{locationData.country}</span>
+                        </div>
                       )}
                       {locationData.postcode && (
-                        <li>Postcode: {locationData.postcode}</li>
+                        <div className="flex items-center">
+                          <MapPin className="w-5 h-5 mr-2" />
+                          <span>{locationData.postcode}</span>
+                        </div>
                       )}
-                    </ul>
-                  </div>
+                    </div>
+                  </motion.div>
                 )}
 
                 <button
@@ -185,20 +270,44 @@ const PlantRecommendationSystem = () => {
               <h2 className="text-2xl font-semibold text-green-800 mb-4">
                 Weather Conditions
               </h2>
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <Sun className="mr-2 text-yellow-500" />
-                  <span>Temperature: {dummyWeatherData.temperature}°C</span>
-                </div>
-                <div className="flex items-center">
-                  <Droplets className="mr-2 text-blue-500" />
-                  <span>Humidity: {dummyWeatherData.humidity}%</span>
-                </div>
-                <div className="flex items-center">
-                  <Wind className="mr-2 text-gray-500" />
-                  <span>Annual Rainfall: {dummyWeatherData.rainfall} mm</span>
-                </div>
-              </div>
+              {weatherData ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-white rounded-lg shadow-md p-6"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <WeatherIcon condition={weatherData.condition} />
+                    <div className="text-right">
+                      <p className="text-3xl font-bold">
+                        {weatherData.temperature.toFixed(1)}°C
+                      </p>
+                      <p className="text-gray-600 capitalize">
+                        {weatherData.description}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center">
+                      <Droplets className="w-6 h-6 mr-2 text-blue-500" />
+                      <span>Humidity: {weatherData.humidity}%</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Wind className="w-6 h-6 mr-2 text-gray-500" />
+                      <span>Wind: {weatherData.windSpeed} m/s</span>
+                    </div>
+                    <div className="flex items-center col-span-2">
+                      <CloudRain className="w-6 h-6 mr-2 text-blue-400" />
+                      <span>
+                        Monthly Rainfall: {monthlyRainfall.toFixed(1)} mm
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              ) : (
+                <p>Loading weather data...</p>
+              )}
 
               {recommendation && (
                 <motion.div
