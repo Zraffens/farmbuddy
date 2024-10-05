@@ -41,43 +41,7 @@ export default function Hero() {
 
   return (
     <div className="flex flex-col gap-4 max-w-10xl h-[50vh] md:h-[75vh] size-screen mx-auto justify-center bg-green-50">
-      <div className="relative z-10 hidden lg:block">
-        <motion.img
-          src="/weather.png" // Change to a more farm-related image
-          alt="Irrigation"
-          className="hidden lg:block absolute -top-10 left-24 -rotate-12 drop-shadow-[0_16px_24px_rgba(49,120,198,0.35)]"
-          style={{
-            x: mousePosition.x * 0.04,
-            y: mousePosition.y * 0.04,
-          }}
-          variants={floatingVariant}
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1 }}
-          whileHover={{ scale: 1.2 }}
-          whileTap={{ scale: 0.9 }}
-          width="80px"
-        />
-
-        <motion.img
-          src="/fertilizer.png" // Another farm-related icon
-          alt="Tractor"
-          className="hidden lg:block absolute bottom-5 right-20 rotate-12 drop-shadow-[0_16px_24px_rgba(80,201,162,0.35)]"
-          style={{
-            x: mousePosition.x * 0.02,
-            y: mousePosition.y * 0.02,
-          }}
-          variants={floatingVariant}
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1 }}
-          whileHover={{ scale: 1.2 }}
-          whileTap={{ scale: 0.9 }}
-          width="50px"
-        />
-
-        {/* Add more farm-related images/icons as needed */}
-      </div>
+      <div className="relative z-10 hidden lg:block"></div>
 
       <div className="absolute inset-0 overflow-hidden pointer-events-none bg-green-50">
         <div className="absolute inset-0 opacity-30">
