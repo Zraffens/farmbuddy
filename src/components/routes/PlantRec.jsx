@@ -19,20 +19,34 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
 });
 
-const LocationMarker = ({ position, setPosition }) => {
+const LocationMarker = ({ position, setPosition, setLocationData }) => {
   const map = useMapEvents({
     click(e) {
       setPosition(e.latlng);
+      fetchLocationData(e.latlng);
     },
     locationfound(e) {
       setPosition(e.latlng);
       map.flyTo(e.latlng, map.getZoom());
+      fetchLocationData(e.latlng);
     },
   });
 
   useEffect(() => {
     map.locate();
   }, [map]);
+
+  const fetchLocationData = async (latlng) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`
+      );
+      const data = await response.json();
+      setLocationData(data.address);
+    } catch (error) {
+      console.error("Error fetching location data:", error);
+    }
+  };
 
   return position === null ? null : <Marker position={position} />;
 };
@@ -42,7 +56,7 @@ const PlantRecommendationSystem = () => {
   const [position, setPosition] = useState(null);
   const [recommendation, setRecommendation] = useState(null);
   const [askingLocation, setAskingLocation] = useState(true);
-
+  const [locationData, setLocationData] = useState(null);
   const dummyWeatherData = {
     temperature: 25,
     humidity: 60,
@@ -130,9 +144,33 @@ const PlantRecommendationSystem = () => {
                     <LocationMarker
                       position={position}
                       setPosition={setPosition}
+                      setLocationData={setLocationData}
                     />
                   </MapContainer>
                 </div>
+
+                {locationData && (
+                  <div className="mt-4 p-4 bg-green-50 rounded-md">
+                    <h3 className="text-lg font-semibold mb-2">
+                      Location Details:
+                    </h3>
+                    <ul className="space-y-1">
+                      {locationData.city && <li>City: {locationData.city}</li>}
+                      {locationData.state && (
+                        <li>State: {locationData.state}</li>
+                      )}
+                      {locationData.country && (
+                        <li>Country: {locationData.country}</li>
+                      )}
+                      {locationData.county && (
+                        <li>County/District: {locationData.county}</li>
+                      )}
+                      {locationData.postcode && (
+                        <li>Postcode: {locationData.postcode}</li>
+                      )}
+                    </ul>
+                  </div>
+                )}
 
                 <button
                   type="submit"
