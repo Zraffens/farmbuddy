@@ -30,6 +30,7 @@ import { motion } from "framer-motion";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
 
+
 const LocationMarker = ({
   position,
   setPosition,
@@ -79,6 +80,15 @@ const DroughtDashboard = () => {
   const [showLocationAlert, setShowLocationAlert] = useState(true);
   const [weatherData, setWeatherData] = useState(null);
   const [showDroughtAlert, setShowDroughtAlert] = useState(false);
+  const [showOversaturationAlert, setShowOversaturationAlert] = useState(false);
+
+  useEffect(() => {
+    if (weatherData && weatherData.length > 0) {
+      const latestData = weatherData[weatherData.length - 1];
+      setShowDroughtAlert(latestData.droughtIndex < 0);
+      setShowOversaturationAlert(latestData.soilMoisture > 1);
+    }
+  }, [weatherData]);
 
   useEffect(() => {
     if (showLocationAlert) {
@@ -187,12 +197,36 @@ const DroughtDashboard = () => {
           <div className="flex items-center">
             <AlertTriangle className="w-6 h-6 mr-2" />
             <p>
-              Warning: The latest drought index is below zero! Drought Possibility Detected!
+              Warning: The latest drought index is below zero! Drought
+              Possibility Detected!
             </p>
           </div>
           <button
             onClick={() => setShowDroughtAlert(false)}
             className="text-red-700 font-bold"
+          >
+            ×
+          </button>
+        </motion.div>
+      )}
+
+      {showOversaturationAlert && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="bg-blue-100 w-4/5 mx-auto border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded-md flex items-center justify-between"
+        >
+          <div className="flex items-center">
+            <AlertTriangle className="w-6 h-6 mr-2" />
+            <p>
+              Warning: The latest soil moisture index is above 1! Soil
+              oversaturation and wetting detected!
+            </p>
+          </div>
+          <button
+            onClick={() => setShowOversaturationAlert(false)}
+            className="text-blue-700 font-bold"
           >
             ×
           </button>

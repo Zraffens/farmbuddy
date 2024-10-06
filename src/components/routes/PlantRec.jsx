@@ -20,6 +20,7 @@ import {
   CloudLightning,
   AlertTriangle,
 } from "lucide-react";
+import { Button } from "../ui/Button";
 import "leaflet/dist/leaflet.css";
 
 // Fix for default marker icon
@@ -103,6 +104,7 @@ const PlantRecommendationSystem = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [monthlyRainfall, setMonthlyRainfall] = useState(null);
   const [showLocationAlert, setShowLocationAlert] = useState(true);
+  const [showPhAlert, setShowPhAlert] = useState(false);
 
   const fetchWeatherData = async (lat, lon) => {
     const API_KEY = process.env.REACT_APP_OPENWAPI;
@@ -126,6 +128,7 @@ const PlantRecommendationSystem = () => {
       console.error("Error fetching weather data:", error);
     }
   };
+
   useEffect(() => {
     if (showLocationAlert) {
       const timer = setTimeout(() => {
@@ -144,7 +147,13 @@ const PlantRecommendationSystem = () => {
   }, [position]);
 
   const handleNpkChange = (e) => {
-    setNpk({ ...npk, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setNpk({ ...npk, [name]: value });
+
+    if (name === "ph") {
+      const phValue = parseFloat(value);
+      setShowPhAlert(phValue < 0 || phValue > 14);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -152,6 +161,12 @@ const PlantRecommendationSystem = () => {
 
     if (!weatherData) {
       console.error("Weather data is not available");
+      return;
+    }
+
+    const phValue = parseFloat(npk.ph);
+    if (phValue < 0 || phValue > 14) {
+      setShowPhAlert(true);
       return;
     }
 
@@ -222,6 +237,28 @@ const PlantRecommendationSystem = () => {
             </button>
           </motion.div>
         )}
+        {showPhAlert && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-red-100 w-4/5 mx-auto border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md flex items-center justify-between"
+          >
+            <div className="flex items-center">
+              <AlertTriangle className="w-6 h-6 mr-2" />
+              <p>
+                Error: pH value must be between 0 and 14. Please enter a valid
+                pH value.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowPhAlert(false)}
+              className="text-red-700 font-bold"
+            >
+              ×
+            </button>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
@@ -248,6 +285,10 @@ const PlantRecommendationSystem = () => {
                       />
                     </div>
                   ))}
+
+                  <Button className="bg-green-600 text-white mt-4">
+                    Use sensors
+                  </Button>
                 </div>
               </div>
 
