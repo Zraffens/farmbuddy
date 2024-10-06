@@ -154,11 +154,47 @@ const PlantRecommendationSystem = () => {
     setNpk({ ...npk, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const randomPlant =
-      dummyPlants[Math.floor(Math.random() * dummyPlants.length)];
-    setRecommendation(randomPlant);
+
+    if (!weatherData) {
+      console.error("Weather data is not available");
+      return;
+    }
+
+    const payload = {
+      N: parseInt(npk.n),
+      P: parseInt(npk.p),
+      K: parseInt(npk.k),
+      humidity: weatherData.humidity,
+      ph: 7.08, // Hardcoded pH value
+      rainfall: monthlyRainfall,
+      temperature: weatherData.temperature,
+    };
+
+    try {
+      const response = await fetch("https://nsa2024.onrender.com/plantrec", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setRecommendation({
+        name: data.recommendation,
+        image: `https://via.placeholder.com/150?text=${encodeURIComponent(
+          data.recommendation
+        )}`,
+      });
+    } catch (error) {
+      console.error("Error fetching plant recommendation:", error);
+    }
   };
 
   return (

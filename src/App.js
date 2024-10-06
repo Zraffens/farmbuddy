@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./components/routes/Home";
 import Header from "./components/custom/header";
 import { UserProvider } from "./context/UserContext";
-import DraughtDashboard from "./components/routes/DraughtDashboard";
+import DroughtDashboard from "./components/routes/DroughtDashboard";
 import PlantRecommendationSystem from "./components/routes/PlantRec";
 const App = () => {
   return (
@@ -21,7 +21,7 @@ const App = () => {
             path="/plantrec"
             element={<PlantRecommendationSystem />}
           />
-          <Route path="/draughts" element={<DraughtDashboard />} />
+          <Route path="/droughts" element={<DroughtDashboard />} />
         </Routes>
       </Router>
     </UserProvider>
