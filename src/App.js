@@ -10,8 +10,7 @@ import ResponsiveSidebar from "./components/custom/mobilenav";
 import axios from "axios";
 
 const App = () => {
-  const test = axios.get("https://nsa2024.onrender.com/");
-  console.log(test)
+  // const test = axios.get("https://nsa2024
   return (
     <UserProvider>
       <Router>

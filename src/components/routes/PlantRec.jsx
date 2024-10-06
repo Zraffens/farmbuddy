@@ -96,7 +96,7 @@ const WeatherIcon = ({ condition }) => {
 };
 
 const PlantRecommendationSystem = () => {
-  const [npk, setNpk] = useState({ n: "", p: "", k: "", ph: "" });
+  const [npk, setNpk] = useState({ n: "72", p: "1", k: "9", ph: "6.7" });
   const [position, setPosition] = useState(null);
   const [recommendation, setRecommendation] = useState(null);
   const [askingLocation, setAskingLocation] = useState(true);
@@ -312,7 +312,7 @@ const PlantRecommendationSystem = () => {
                         name={nutrient}
                         value={npk[nutrient]}
                         onChange={handleNpkChange}
-                        placeholder="0"
+                        placeholder={npk[nutrient]}
                         className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full text-lg border-gray-300 rounded-md"
                       />
                     </div>
