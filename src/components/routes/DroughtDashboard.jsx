@@ -78,6 +78,7 @@ const DroughtDashboard = () => {
   const [locationData, setLocationData] = useState(null);
   const [showLocationAlert, setShowLocationAlert] = useState(true);
   const [weatherData, setWeatherData] = useState(null);
+  const [showDroughtAlert, setShowDroughtAlert] = useState(false);
 
   useEffect(() => {
     if (showLocationAlert) {
@@ -87,6 +88,14 @@ const DroughtDashboard = () => {
       return () => clearTimeout(timer);
     }
   }, [showLocationAlert]);
+
+  useEffect(() => {
+    if (weatherData && weatherData.length > 0) {
+      const latestDroughtValue =
+        weatherData[weatherData.length - 1].droughtIndex;
+      setShowDroughtAlert(latestDroughtValue < 0);
+    }
+  }, [weatherData]);
 
   const fetchWeatherData = async (latlng) => {
     try {
@@ -163,6 +172,27 @@ const DroughtDashboard = () => {
           <button
             onClick={() => setShowLocationAlert(false)}
             className="text-yellow-700 font-bold"
+          >
+            ×
+          </button>
+        </motion.div>
+      )}
+      {showDroughtAlert && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="bg-red-100 w-4/5 mx-auto border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md flex items-center justify-between"
+        >
+          <div className="flex items-center">
+            <AlertTriangle className="w-6 h-6 mr-2" />
+            <p>
+              Warning: The latest drought index is below zero! Drought Possibility Detected!
+            </p>
+          </div>
+          <button
+            onClick={() => setShowDroughtAlert(false)}
+            className="text-red-700 font-bold"
           >
             ×
           </button>
@@ -317,7 +347,7 @@ const DroughtDashboard = () => {
           </ResponsiveContainer>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 1.2 }}
