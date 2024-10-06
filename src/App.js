@@ -7,23 +7,20 @@ import { UserProvider } from "./context/UserContext";
 import DroughtDashboard from "./components/routes/DroughtDashboard";
 import PlantRecommendationSystem from "./components/routes/PlantRec";
 import ResponsiveSidebar from "./components/custom/mobilenav";
+import axios from "axios";
 
 const App = () => {
+  const test = axios.get("https://nsa2024.onrender.com/");
+  console.log(test)
   return (
     <UserProvider>
-      {/* Router should wrap around the entire app */}
       <Router>
-        {/* Header needs to be inside Router */}
         <Header />
         <ResponsiveSidebar />
 
-        {/* Define all routes here */}
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route
-            path="/plantrec"
-            element={<PlantRecommendationSystem />}
-          />
+          <Route path="/plantrec" element={<PlantRecommendationSystem />} />
           <Route path="/droughts" element={<DroughtDashboard />} />
         </Routes>
       </Router>
