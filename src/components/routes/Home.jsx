@@ -139,7 +139,7 @@ const Home = () => {
           <section className="h-screen flex justify-center relative">
             <Hero />
             <motion.div
-              className="absolute bottom-24 left-1/2 transform -translate-x-1/2 cursor-pointer"
+              className="absolute bottom-24 transform -translate-x-1/2 cursor-pointer"
               initial={{ opacity: 0, y: -20 }}
               animate={{
                 opacity: showChevron ? 1 : 0,
@@ -153,7 +153,7 @@ const Home = () => {
           </section>
 
           <section
-            className="w-full py-12 flex justify-center md:py-16 lg:py-24 bg-white"
+            className="w-full pt-2 pb-16 flex justify-center md:pt-2 md:pb-24 lg:pt-2 lg:pb-24 bg-white"
             id="features"
           >
             <div className="container px-4 md:px-6">

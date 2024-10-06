@@ -6,6 +6,8 @@ import Header from "./components/custom/header";
 import { UserProvider } from "./context/UserContext";
 import DroughtDashboard from "./components/routes/DroughtDashboard";
 import PlantRecommendationSystem from "./components/routes/PlantRec";
+import ResponsiveSidebar from "./components/custom/mobilenav";
+
 const App = () => {
   return (
     <UserProvider>
@@ -13,6 +15,7 @@ const App = () => {
       <Router>
         {/* Header needs to be inside Router */}
         <Header />
+        <ResponsiveSidebar />
 
         {/* Define all routes here */}
         <Routes>
