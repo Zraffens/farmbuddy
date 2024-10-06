@@ -110,7 +110,7 @@ const DroughtDashboard = () => {
   const fetchWeatherData = async (latlng) => {
     try {
       const response = await axios.post(
-        "https://nsa2024.onrender.com/weatherdata",
+        "https://nsa2024-production.up.railway.app/weatherdata",
         {
           lat: latlng.lat,
           long: latlng.lng,

@@ -190,13 +190,16 @@ const PlantRecommendationSystem = () => {
     };
 
     try {
-      const response = await fetch("https://nsa2024.onrender.com/plantrec", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        "https://nsa2024-production.up.railway.app/plantrec",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
