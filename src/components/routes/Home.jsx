@@ -1,9 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Card, CardContent } from "../ui/Card";
-import { Users, Calendar, Star, ArrowRight, Droplets } from "lucide-react";
+import {
+  Users,
+  Calendar,
+  Star,
+  ArrowRight,
+  Droplets,
+  ChevronDown,
+} from "lucide-react";
 import {
   Accordion,
   AccordionItem,
@@ -86,31 +93,67 @@ const FAQItem = ({ question, answer, value }) => {
 };
 
 const Home = () => {
+  const [showChevron, setShowChevron] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setShowChevron(false);
+      } else {
+        setShowChevron(true);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToFeatures = () => {
+    const featuresSection = document.getElementById("features");
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
   const faqs = [
     {
       question: "What is FarmBuddy?",
-      answer: "FarmBuddy is an innovative app designed to assist farmers by analyzing vast amounts of data related to weather patterns, soil conditions, and crop health. It provides personalized recommendations for irrigation, planting schedules, and more to optimize your farming practices and enhance crop yields.",
+      answer:
+        "FarmBuddy is an innovative app designed to assist farmers by analyzing vast amounts of data related to weather patterns, soil conditions, and crop health. It provides personalized recommendations for irrigation, planting schedules, and more to optimize your farming practices and enhance crop yields.",
     },
     {
       question: "How does FarmBuddy gather and analyze data?",
-      answer: "FarmBuddy utilizes a combination of historical data and real-time information from various sources, including weather forecasts, soil sensors, and satellite imagery. Our advanced algorithms process this data to generate actionable insights tailored to your specific farming needs.",
+      answer:
+        "FarmBuddy utilizes a combination of historical data and real-time information from various sources, including weather forecasts, soil sensors, and satellite imagery. Our advanced algorithms process this data to generate actionable insights tailored to your specific farming needs.",
     },
     {
       question: "Is FarmBuddy suitable for all types of farms?",
-      answer: "Yes, FarmBuddy is designed to support a wide range of farming operations, whether you're managing a small vegetable garden or a large-scale agricultural enterprise. The app provides customizable recommendations based on the specific crops you grow, your geographic location, and your unique farming practices.",
+      answer:
+        "Yes, FarmBuddy is designed to support a wide range of farming operations, whether you're managing a small vegetable garden or a large-scale agricultural enterprise. The app provides customizable recommendations based on the specific crops you grow, your geographic location, and your unique farming practices.",
     },
   ];
-  
+
   return (
     <div className="flex flex-col w-full bg-gray-50">
       <div className="min-h-screen bg-gray-100 font-poppins">
         <main>
-          <section className="lg:h-screen flex justify-center relative">
+          <section className="h-screen flex justify-center relative">
             <Hero />
+            <motion.div
+              className="absolute bottom-24 left-1/2 transform -translate-x-1/2 cursor-pointer"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{
+                opacity: showChevron ? 1 : 0,
+                y: showChevron ? 0 : 20,
+              }}
+              transition={{ duration: 0.3 }}
+              onClick={scrollToFeatures}
+            >
+              <ChevronDown className="h-16 w-16 text-green-500 animate-bounce" />
+            </motion.div>
           </section>
 
           <section
-            className="w-full py-12 flex justify-center md:py-24 lg:py-32 bg-white"
+            className="w-full py-12 flex justify-center md:py-16 lg:py-24 bg-white"
             id="features"
           >
             <div className="container px-4 md:px-6">

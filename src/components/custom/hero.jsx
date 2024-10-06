@@ -37,7 +37,6 @@ export default function Hero() {
   };
 
   const [userQuery, setUserQuery] = useState("");
-  const [searching, setSearching] = useState(false);
 
   return (
     <div className="flex flex-col gap-4 max-w-10xl h-[50vh] md:h-[75vh] size-screen mx-auto justify-center bg-green-50">
@@ -81,31 +80,6 @@ export default function Hero() {
         <p className="text-green-600 max-w-lg text-center tracking-tight md:text-lg font-light">
           Your companion for all farming needs.
         </p>
-        <div className="mt-10 flex items-center space-x-2">
-          <input
-            type="text"
-            placeholder="Search for help"
-            className="px-4 py-2 border rounded-md"
-            value={userQuery}
-            onChange={(e) => setUserQuery(e.target.value)}
-            disabled={searching}
-          />
-          <button
-            className={`bg-green-500 text-white px-4 py-2 rounded-md ${
-              searching ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            onClick={() => {
-              setSearching(true);
-              // Add your search functionality here
-              setTimeout(() => {
-                setSearching(false);
-              }, 2000); // Simulating an API call
-            }}
-            disabled={searching}
-          >
-            {searching ? "Searching..." : "Search"}
-          </button>
-        </div>
       </motion.div>
     </div>
   );
