@@ -93,12 +93,12 @@ const DroughtDashboard = () => {
       const response = await axios.post(
         "https://nsa2024.onrender.com/weatherdata",
         {
-          lat: 27.7172,
-          long: 85.324,
+          lat: latlng.lat,
+          long: latlng.lng,
         }
       );
       const data = response.data;
-      console.log(data, "adfasdf");
+      console.log(data, "Weather data fetched");
 
       // Process the data to match the chart format
       const processedData = data.soil_moisture_index.map((value, index) => ({
@@ -154,7 +154,7 @@ const DroughtDashboard = () => {
         </motion.div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
