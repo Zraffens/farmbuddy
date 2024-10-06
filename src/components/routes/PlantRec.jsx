@@ -104,12 +104,6 @@ const PlantRecommendationSystem = () => {
   const [monthlyRainfall, setMonthlyRainfall] = useState(null);
   const [showLocationAlert, setShowLocationAlert] = useState(true);
 
-  const dummyPlants = [
-    { name: "Rice", image: "https://via.placeholder.com/150?text=Rice" },
-    { name: "Wheat", image: "https://via.placeholder.com/150?text=Wheat" },
-    { name: "Maize", image: "https://via.placeholder.com/150?text=Maize" },
-  ];
-
   const fetchWeatherData = async (lat, lon) => {
     const API_KEY = process.env.REACT_APP_OPENWAPI;
     try {
@@ -378,13 +372,13 @@ const PlantRecommendationSystem = () => {
                 </h2>
                 <div className="bg-white rounded-lg shadow-md p-4 flex items-center">
                   <img
-                    src={recommendation.image}
-                    alt={recommendation.name}
+                    src={`photos/${recommendation.name}.jpeg`}
+                    alt={recommendation.name.toUpperCase()}
                     className="w-20 h-20 rounded-full mr-4"
                   />
                   <div>
                     <h3 className="text-xl font-semibold">
-                      {recommendation.name}
+                      {recommendation.name.toUpperCase()}
                     </h3>
                     <p className="text-gray-600">
                       Best suited for your soil and climate
