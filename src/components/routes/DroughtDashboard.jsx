@@ -1,4 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
 import {
   LineChart,
   Line,
@@ -9,8 +17,15 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import { MapPin, Droplets, Thermometer, Wind } from "lucide-react";
+import {
+  MapPin,
+  Droplets,
+  Thermometer,
+  Wind,
+  AlertTriangle,
+} from "lucide-react";
 import { motion } from "framer-motion";
+import "leaflet/dist/leaflet.css";
 
 const mockData = {
   soilMoisture: [
@@ -52,9 +67,55 @@ const mockData = {
   ],
 };
 
+const LocationMarker = ({ position, setPosition, setLocationData }) => {
+  const map = useMapEvents({
+    click(e) {
+      setPosition(e.latlng);
+      fetchLocationData(e.latlng);
+    },
+    locationfound(e) {
+      setPosition(e.latlng);
+      map.flyTo(e.latlng, map.getZoom());
+      fetchLocationData(e.latlng);
+    },
+  });
+
+  useEffect(() => {
+    map.locate();
+  }, [map]);
+
+  const fetchLocationData = async (latlng) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`
+      );
+      const data = await response.json();
+      setLocationData(data.address);
+    } catch (error) {
+      console.error("Error fetching location data:", error);
+    }
+  };
+
+  return position === null ? null : (
+    <Marker position={position}>
+      <Popup>Selected location</Popup>
+    </Marker>
+  );
+};
+
 const DroughtDashboard = () => {
-  const [selectedRegion, setSelectedRegion] = useState("Jumla");
-  const [selectedPeriod, setSelectedPeriod] = useState("Dekad");
+  const [position, setPosition] = useState(null);
+  const [locationData, setLocationData] = useState(null);
+  const [showLocationAlert, setShowLocationAlert] = useState(true);
+
+  useEffect(() => {
+    if (showLocationAlert) {
+      const timer = setTimeout(() => {
+        setShowLocationAlert(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showLocationAlert]);
 
   return (
     <div className="bg-gradient-to-br from-blue-100 to-green-100 min-h-screen p-8">
@@ -64,8 +125,30 @@ const DroughtDashboard = () => {
         transition={{ duration: 0.5 }}
         className="text-4xl font-bold text-blue-800 mb-8 text-center"
       >
-        drought
+        Drought Dashboard
       </motion.h1>
+
+      {showLocationAlert && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-yellow-100 w-4/5 mx-auto border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-md flex items-center justify-between"
+        >
+          <div className="flex items-center">
+            <AlertTriangle className="w-6 h-6 mr-2" />
+            <p>
+              To provide accurate recommendations, we need your location. Please
+              allow location access when prompted.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowLocationAlert(false)}
+            className="text-yellow-700 font-bold"
+          >
+            ×
+          </button>
+        </motion.div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <motion.div
@@ -77,40 +160,50 @@ const DroughtDashboard = () => {
           <h2 className="text-2xl font-semibold mb-4 flex items-center">
             <MapPin className="mr-2" /> Region Selection
           </h2>
-          <select
-            value={selectedRegion}
-            onChange={(e) => setSelectedRegion(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded"
-          >
-            <option value="Jumla">Jumla</option>
-            <option value="Kathmandu">Kathmandu</option>
-            <option value="Pokhara">Pokhara</option>
-          </select>
-          <div className="mt-4">
-            <h3 className="text-xl font-semibold mb-2">Select Periodicity</h3>
-            <div className="flex space-x-4">
-              {["Dekad", "1 Month", "3 Months"].map((period) => (
-                <button
-                  key={period}
-                  onClick={() => setSelectedPeriod(period)}
-                  className={`px-4 py-2 rounded ${
-                    selectedPeriod === period
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  {period}
-                </button>
-              ))}
-            </div>
+          <div className="h-64 w-full rounded-lg overflow-hidden mb-4">
+            <MapContainer
+              center={[28.3949, 84.124]}
+              zoom={7}
+              className="h-full w-full"
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              <LocationMarker
+                position={position}
+                setPosition={setPosition}
+                setLocationData={setLocationData}
+              />
+            </MapContainer>
           </div>
+          {locationData && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mb-4 p-4 bg-blue-50 rounded-lg"
+            >
+              <h3 className="text-lg font-semibold mb-2">Location Details</h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                {locationData.city && <div>City: {locationData.city}</div>}
+                {locationData.state && <div>State: {locationData.state}</div>}
+                {locationData.country && (
+                  <div>Country: {locationData.country}</div>
+                )}
+                {locationData.postcode && (
+                  <div>Postcode: {locationData.postcode}</div>
+                )}
+              </div>
+            </motion.div>
+          )}
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="bg-white rounded-lg shadow-lg p-6 col-span-2"
+          className="bg-white rounded-lg shadow-lg p-6 lg:col-span-2"
         >
           <h2 className="text-2xl font-semibold mb-4 flex items-center">
             <Droplets className="mr-2" /> Soil Moisture
