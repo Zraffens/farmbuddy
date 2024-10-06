@@ -127,9 +127,24 @@ const DroughtDashboard = () => {
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-4xl font-bold text-blue-800 mb-8 text-center"
+        className="text-6xl font-bold text-center mb-8"
       >
-        Drought Dashboard
+        <motion.span
+          initial={{ color: "#1e40af" }}
+          animate={{ color: ["#1e40af", "#3b82f6", "#60a5fa", "#1e40af"] }}
+          transition={{ duration: 4, repeat: Infinity }}
+          className="inline-block"
+        >
+          Drought
+        </motion.span>{" "}
+        <motion.span
+          initial={{ color: "#065f46" }}
+          animate={{ color: ["#065f46", "#10b981", "#34d399", "#065f46"] }}
+          transition={{ duration: 4, repeat: Infinity, delay: 2 }}
+          className="inline-block"
+        >
+          Dashboard
+        </motion.span>
       </motion.h1>
 
       {showLocationAlert && (
@@ -159,7 +174,7 @@ const DroughtDashboard = () => {
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-white rounded-lg shadow-lg p-6"
+          className="bg-white rounded-lg shadow-lg p-6 min-h-[500px]"
         >
           <h2 className="text-2xl font-semibold mb-4 flex items-center">
             <MapPin className="mr-2" /> Region Selection
@@ -208,9 +223,9 @@ const DroughtDashboard = () => {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="bg-white rounded-lg shadow-lg p-6"
+          className="bg-white rounded-lg shadow-lg p-6 min-h-[500px]"
         >
-          <h2 className="text-2xl font-semibold mb-4 flex items-center">
+          <h2 className="text-2xl font-semibold mb-24 flex items-center">
             <Droplets className="mr-2" /> Soil Moisture
           </h2>
           <ResponsiveContainer width="100%" height={200}>
@@ -234,9 +249,9 @@ const DroughtDashboard = () => {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
-          className="bg-white rounded-lg shadow-lg p-6"
+          className="bg-white rounded-lg shadow-lg p-6 min-h-[500px]"
         >
-          <h2 className="text-2xl font-semibold mb-4 flex items-center">
+          <h2 className="text-2xl font-semibold mb-24 flex items-center">
             <AlertTriangle className="mr-2" /> Drought Index
           </h2>
           <ResponsiveContainer width="100%" height={200}>
@@ -302,7 +317,7 @@ const DroughtDashboard = () => {
           </ResponsiveContainer>
         </motion.div>
 
-        <motion.div
+        <motion.div 
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 1.2 }}
