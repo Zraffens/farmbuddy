@@ -95,7 +95,7 @@ const WeatherIcon = ({ condition }) => {
 };
 
 const PlantRecommendationSystem = () => {
-  const [npk, setNpk] = useState({ n: "", p: "", k: "" });
+  const [npk, setNpk] = useState({ n: "", p: "", k: "", ph: "" });
   const [position, setPosition] = useState(null);
   const [recommendation, setRecommendation] = useState(null);
   const [askingLocation, setAskingLocation] = useState(true);
@@ -165,8 +165,8 @@ const PlantRecommendationSystem = () => {
       N: parseInt(npk.n),
       P: parseInt(npk.p),
       K: parseInt(npk.k),
+      ph: parseInt(npk.ph),
       humidity: weatherData.humidity,
-      ph: 7.08, // Hardcoded pH value
       rainfall: monthlyRainfall,
       temperature: weatherData.temperature,
     };
@@ -239,7 +239,7 @@ const PlantRecommendationSystem = () => {
                   NPK Composition
                 </label>
                 <div className="grid grid-cols-3 gap-4">
-                  {["n", "p", "k"].map((nutrient) => (
+                  {["n", "p", "k", "ph"].map((nutrient) => (
                     <div key={nutrient} className="flex flex-col">
                       <label className="text-sm font-medium text-green-700 mb-1">
                         {nutrient.toUpperCase()}

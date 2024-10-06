@@ -16,6 +16,7 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
+  Legend,
 } from "recharts";
 import {
   MapPin,
@@ -23,60 +24,29 @@ import {
   Thermometer,
   Wind,
   AlertTriangle,
+  CloudRain,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import "leaflet/dist/leaflet.css";
+import axios from "axios";
 
-const mockData = {
-  soilMoisture: [
-    { date: "2024-02-01", value: 250 },
-    { date: "2024-02-15", value: 230 },
-    { date: "2024-03-01", value: 200 },
-    { date: "2024-03-15", value: 180 },
-    { date: "2024-04-01", value: 194.3219 },
-  ],
-  rainfall: [
-    { date: "2024-03-25", value: 2 },
-    { date: "2024-03-26", value: 0 },
-    { date: "2024-03-27", value: 1 },
-    { date: "2024-03-28", value: 3 },
-    { date: "2024-03-29", value: 5 },
-    { date: "2024-03-30", value: 2 },
-    { date: "2024-03-31", value: 0 },
-    { date: "2024-04-01", value: 1 },
-  ],
-  temperature: [
-    { date: "2024-03-25", min: 10, max: 22 },
-    { date: "2024-03-26", min: 12, max: 24 },
-    { date: "2024-03-27", min: 11, max: 23 },
-    { date: "2024-03-28", min: 9, max: 21 },
-    { date: "2024-03-29", min: 10, max: 22 },
-    { date: "2024-03-30", min: 13, max: 25 },
-    { date: "2024-03-31", min: 12, max: 24 },
-    { date: "2024-04-01", min: 11, max: 23 },
-  ],
-  evapotranspiration: [
-    { date: "2024-03-25", value: 1.2 },
-    { date: "2024-03-26", value: 1.5 },
-    { date: "2024-03-27", value: 1.3 },
-    { date: "2024-03-28", value: 1.1 },
-    { date: "2024-03-29", value: 1.4 },
-    { date: "2024-03-30", value: 1.6 },
-    { date: "2024-03-31", value: 1.5 },
-    { date: "2024-04-01", value: 1.3 },
-  ],
-};
-
-const LocationMarker = ({ position, setPosition, setLocationData }) => {
+const LocationMarker = ({
+  position,
+  setPosition,
+  setLocationData,
+  fetchWeatherData,
+}) => {
   const map = useMapEvents({
     click(e) {
       setPosition(e.latlng);
       fetchLocationData(e.latlng);
+      fetchWeatherData(e.latlng);
     },
     locationfound(e) {
       setPosition(e.latlng);
       map.flyTo(e.latlng, map.getZoom());
       fetchLocationData(e.latlng);
+      fetchWeatherData(e.latlng);
     },
   });
 
@@ -107,6 +77,7 @@ const DroughtDashboard = () => {
   const [position, setPosition] = useState(null);
   const [locationData, setLocationData] = useState(null);
   const [showLocationAlert, setShowLocationAlert] = useState(true);
+  const [weatherData, setWeatherData] = useState(null);
 
   useEffect(() => {
     if (showLocationAlert) {
@@ -116,6 +87,39 @@ const DroughtDashboard = () => {
       return () => clearTimeout(timer);
     }
   }, [showLocationAlert]);
+
+  const fetchWeatherData = async (latlng) => {
+    try {
+      const response = await axios.post(
+        "https://nsa2024.onrender.com/weatherdata",
+        {
+          lat: 27.7172,
+          long: 85.324,
+        }
+      );
+      const data = response.data;
+      console.log(data, "adfasdf");
+
+      // Process the data to match the chart format
+      const processedData = data.soil_moisture_index.map((value, index) => ({
+        date: new Date(
+          Date.now() -
+            (data.soil_moisture_index.length - 1 - index) * 24 * 60 * 60 * 1000
+        )
+          .toISOString()
+          .split("T")[0],
+        soilMoisture: value,
+        droughtIndex: data.drought_index[index],
+        temperature: data.temperature[index],
+        evapotranspiration: data.evapotranspiration[index],
+        rainfall: data.rainfall[index],
+      }));
+
+      setWeatherData(processedData);
+    } catch (error) {
+      console.error("Error fetching weather data:", error);
+    }
+  };
 
   return (
     <div className="bg-gradient-to-br from-blue-100 to-green-100 min-h-screen p-8">
@@ -174,6 +178,7 @@ const DroughtDashboard = () => {
                 position={position}
                 setPosition={setPosition}
                 setLocationData={setLocationData}
+                fetchWeatherData={fetchWeatherData}
               />
             </MapContainer>
           </div>
@@ -203,42 +208,51 @@ const DroughtDashboard = () => {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="bg-white rounded-lg shadow-lg p-6 lg:col-span-2"
+          className="bg-white rounded-lg shadow-lg p-6"
         >
           <h2 className="text-2xl font-semibold mb-4 flex items-center">
             <Droplets className="mr-2" /> Soil Moisture
           </h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={mockData.soilMoisture}>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={weatherData}>
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
+              <Legend />
               <Line
                 type="monotone"
-                dataKey="value"
+                dataKey="soilMoisture"
                 stroke="#8884d8"
                 strokeWidth={2}
+                name="Soil Moisture Index"
               />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
           className="bg-white rounded-lg shadow-lg p-6"
         >
           <h2 className="text-2xl font-semibold mb-4 flex items-center">
-            <Droplets className="mr-2" /> Rainfall
+            <AlertTriangle className="mr-2" /> Drought Index
           </h2>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={mockData.rainfall}>
+            <LineChart data={weatherData}>
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="value" fill="#82ca9d" />
-            </BarChart>
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="droughtIndex"
+                stroke="#FF8042"
+                strokeWidth={2}
+                name="Drought Index"
+              />
+            </LineChart>
           </ResponsiveContainer>
         </motion.div>
 
@@ -249,24 +263,40 @@ const DroughtDashboard = () => {
           className="bg-white rounded-lg shadow-lg p-6"
         >
           <h2 className="text-2xl font-semibold mb-4 flex items-center">
-            <Thermometer className="mr-2" /> Temperature
+            <CloudRain className="mr-2" /> Rainfall
           </h2>
           <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={mockData.temperature}>
+            <BarChart data={weatherData}>
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
+              <Legend />
+              <Bar dataKey="rainfall" fill="#82ca9d" name="Rainfall (mm)" />
+            </BarChart>
+          </ResponsiveContainer>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 1 }}
+          className="bg-white rounded-lg shadow-lg p-6"
+        >
+          <h2 className="text-2xl font-semibold mb-4 flex items-center">
+            <Thermometer className="mr-2" /> Temperature
+          </h2>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={weatherData}>
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
               <Line
                 type="monotone"
-                dataKey="min"
+                dataKey="temperature"
                 stroke="#8884d8"
                 strokeWidth={2}
-              />
-              <Line
-                type="monotone"
-                dataKey="max"
-                stroke="#82ca9d"
-                strokeWidth={2}
+                name="Temperature (°C)"
               />
             </LineChart>
           </ResponsiveContainer>
@@ -275,18 +305,23 @@ const DroughtDashboard = () => {
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 1 }}
+          transition={{ duration: 0.5, delay: 1.2 }}
           className="bg-white rounded-lg shadow-lg p-6"
         >
           <h2 className="text-2xl font-semibold mb-4 flex items-center">
-            <Wind className="mr-2" /> Total Evapotranspiration
+            <Wind className="mr-2" /> Evapotranspiration
           </h2>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={mockData.evapotranspiration}>
+            <BarChart data={weatherData}>
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="value" fill="#8884d8" />
+              <Legend />
+              <Bar
+                dataKey="evapotranspiration"
+                fill="#8884d8"
+                name="Evapotranspiration (mm)"
+              />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
