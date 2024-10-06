@@ -24,11 +24,11 @@ const Header = () => {
             Plant Recommendation
           </NavLink>
           <NavLink
-            to="/flood"
+            to="/droughts"
             className="text-gray-600 hover:text-gray-900"
             activeClassName="text-gray-900 font-bold"
           >
-            Flood Status
+            Drought Status
           </NavLink>
         </nav>
       </div>
