@@ -1,27 +1,40 @@
-import * as React from "react";
-import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+import React, { useState } from "react";
 
-import { cn } from "../../lib/utils";
+const TooltipContext = React.createContext({
+  open: false,
+  setOpen: () => {},
+});
 
-const TooltipProvider = TooltipPrimitive.Provider;
+export const Tooltip = ({ children }) => {
+  const [open, setOpen] = useState(false);
 
-const Tooltip = TooltipPrimitive.Root;
+  return (
+    <TooltipContext.Provider value={{ open, setOpen }}>
+      {children}
+    </TooltipContext.Provider>
+  );
+};
 
-const TooltipTrigger = TooltipPrimitive.Trigger;
+export const TooltipTrigger = ({ children }) => {
+  const { setOpen } = React.useContext(TooltipContext);
 
-const TooltipContent = React.forwardRef(
-  ({ className, sideOffset = 4, ...props }, ref) => (
-    <TooltipPrimitive.Content
-      ref={ref}
-      sideOffset={sideOffset}
-      className={cn(
-        "z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-        className
-      )}
-      {...props}
-    />
-  )
-);
-TooltipContent.displayName = TooltipPrimitive.Content.displayName;
+  return (
+    <div onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+      {children}
+    </div>
+  );
+};
 
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };
+export const TooltipContent = ({ children }) => {
+  const { open } = React.useContext(TooltipContext);
+
+  if (!open) return null;
+
+  return (
+    <div className="absolute z-10 p-2 text-sm bg-gray-800 text-white rounded shadow-lg mt-1">
+      {children}
+    </div>
+  );
+};
+
+export const TooltipProvider = Tooltip;

@@ -105,6 +105,7 @@ const PlantRecommendationSystem = () => {
   const [monthlyRainfall, setMonthlyRainfall] = useState(null);
   const [showLocationAlert, setShowLocationAlert] = useState(true);
   const [showPhAlert, setShowPhAlert] = useState(false);
+  const [sensorError, setSensorError] = useState(null);
 
   const fetchWeatherData = async (lat, lon) => {
     const API_KEY = process.env.REACT_APP_OPENWAPI;
@@ -127,6 +128,14 @@ const PlantRecommendationSystem = () => {
     } catch (error) {
       console.error("Error fetching weather data:", error);
     }
+  };
+  const handleUseSensors = () => {
+    setSensorError("Error: No external sensors are connected.");
+
+    // Clear the error after 5 seconds
+    setTimeout(() => {
+      setSensorError(null);
+    }, 5000);
   };
 
   useEffect(() => {
@@ -259,6 +268,26 @@ const PlantRecommendationSystem = () => {
             </button>
           </motion.div>
         )}
+
+        {sensorError && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-red-100 w-4/5 mx-auto border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md flex items-center justify-between"
+          >
+            <div className="flex items-center">
+              <AlertTriangle className="w-6 h-6 mr-2" />
+              <p>{sensorError}</p>
+            </div>
+            <button
+              onClick={() => setSensorError(null)}
+              className="text-red-700 font-bold"
+            >
+              ×
+            </button>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
@@ -286,7 +315,10 @@ const PlantRecommendationSystem = () => {
                     </div>
                   ))}
 
-                  <Button className="bg-green-600 text-white mt-4">
+                  <Button
+                    className="bg-green-600 text-white mt-4"
+                    onClick={handleUseSensors}
+                  >
                     Use sensors
                   </Button>
                 </div>
