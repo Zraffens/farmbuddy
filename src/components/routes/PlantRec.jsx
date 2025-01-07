@@ -189,6 +189,11 @@ const PlantRecommendationSystem = () => {
       temperature: weatherData.temperature,
     };
 
+    setRecommendation({
+      name: "Rice",
+      image: null,
+    });
+
     try {
       const response = await fetch(
         "https://nsa2024-production.up.railway.app/plantrec",
@@ -468,9 +473,7 @@ const PlantRecommendationSystem = () => {
                     className="w-20 h-20 rounded-full mr-4"
                   />
                   <div>
-                    <h3 className="text-xl font-semibold">
-                      {`RICE`}
-                    </h3>
+                    <h3 className="text-xl font-semibold">{`RICE`}</h3>
                     <p className="text-gray-600">
                       Best suited for your soil and climate
                     </p>
