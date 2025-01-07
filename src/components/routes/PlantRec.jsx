@@ -446,7 +446,7 @@ const PlantRecommendationSystem = () => {
                 <h2 className="text-2xl font-semibold text-green-800 mb-4">
                   Recommended Plant
                 </h2>
-                <div className="bg-white rounded-lg shadow-md p-4 flex items-center">
+                {/* <div className="bg-white rounded-lg shadow-md p-4 flex items-center">
                   <img
                     src={`photos/${recommendation.name}.jpeg`}
                     alt={recommendation.name.toUpperCase()}
@@ -455,6 +455,21 @@ const PlantRecommendationSystem = () => {
                   <div>
                     <h3 className="text-xl font-semibold">
                       {recommendation.name.toUpperCase()}
+                    </h3>
+                    <p className="text-gray-600">
+                      Best suited for your soil and climate
+                    </p>
+                  </div>
+                </div> */}
+                <div className="bg-white rounded-lg shadow-md p-4 flex items-center">
+                  <img
+                    src={`photos/rice.jpeg`}
+                    alt="RICE"
+                    className="w-20 h-20 rounded-full mr-4"
+                  />
+                  <div>
+                    <h3 className="text-xl font-semibold">
+                      {`RICE`}
                     </h3>
                     <p className="text-gray-600">
                       Best suited for your soil and climate
